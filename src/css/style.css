@@ -42,9 +42,14 @@ ul {
 }
 
 .cat-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 420px 420px;
+  row-gap: 20px;
+}
+
+.cat-text {
+  display: grid;
 }
 
 .thumb {
