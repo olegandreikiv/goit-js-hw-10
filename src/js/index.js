@@ -1,70 +1,51 @@
 import SlimSelect from 'slim-select';
 import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
+import { Report } from 'notiflix/build/notiflix-report-aio'
+import { Loading } from 'notiflix/build/notiflix-loading-aio'
 
-const breedSelect = document.querySelector('.breed-select');
-const loader = document.querySelector('.loader');
-const error = document.querySelector('.error');
-const catInfo = document.querySelector('.cat-info');
 
-// При загрузці сторінкм виконуємо запит до колекції котиків
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    loader.style.display = 'block';
-    breedSelect.style.display = 'none';
-    error.style.display = 'none';
-    catInfo.style.display = 'none';
+const selectContainer = document.querySelector(".breed-select")
+const catCont = document.querySelector(".cat-info");
+selectContainer.addEventListener("change", onSelect)
 
-    const breeds = await fetchBreeds();
+fetchBreeds()
+.then(data => {selectContainer.innerHTML = createSelect(data);
+selectContainer.style.visibility = "visible";
+  new SlimSelect({
+    select: ".breed-select",
+  })
+})
+.finally(()=>Loading.remove())
 
-    const breedOptions = [
-      {
-        value: '',
-        text: 'Choose your breed'
-      },
-      ...breeds.map(breed => ({
-        value: breed.id,
-        text: breed.name
-      }))
-    ];
+function onSelect(e) {
+    const breedId = e.currentTarget.value;
+    fetchCatByBreed(breedId)
+    .then(data => catCont.innerHTML = catsMarkup(data))
+    .catch(err => Report.failure('Oops!', "Something went wrong! Try reloading the page!"))
+    .finally(()=>Loading.remove())
 
-    new SlimSelect({
-      select: breedSelect,
-      data: breedOptions
-    });
+}
 
-    loader.style.display = 'none';
-    breedSelect.style.display = 'block';
-  } catch (error) {
-    loader.style.display = 'none';
-    error.style.display = 'block';
-  }
-});
+function createSelect (arr){
+    let options = arr.map(({ name, id }) => `<option value="${id}">${name}</option>`).join('');
+    options = `<option value="">-- Select Breed --</option>` + options;
+    return options;
+    }
 
-// обробник зміни вибору
-breedSelect.addEventListener('change', () => {
-  const selectedBreedId = breedSelect.value;
 
-  loader.style.display = 'block';
-  error.style.display = 'none';
-  catInfo.style.display = 'flex';
 
-  fetchCatByBreed(selectedBreedId)
-    .then(cat => {
-      catInfo.innerHTML = `<div class="thumb">
-        <img src="${cat.url}" alt="Cat Image" />
-        </div><div class='description'><h1>${cat.breeds[0].name}</h1>
-        <p class='description-text'>
-        <span><b>Description: </b>${cat.breeds[0].description}</span>
-      </p>        
-      <p class='description-temperament'>
-      <span><b>Temperament: </b>${cat.breeds[0].temperament}</span></p>
-        </div>`;
 
-      loader.style.display = 'none';
-      catInfo.style.display = 'flex';
-    })
-    .catch(() => {
-      loader.style.display = 'none';
-      error.style.display = 'block';
-    });
-});
+ function catsMarkup(arr) {
+    if (arr.length === 0){
+     Report.failure('Oops!', "Something went wrong! Try chosing another cat!")
+     return " "
+    } else {
+     return arr.map(({url, breeds},)=>{
+     const { origin, description, name, temperament } = breeds[0];
+     return`<img class="cat-img" src="${url}" alt="${name}" width="400">
+     <div class="cat-text"><h1 class="cat-name">${name}</h1>
+     <p class="descr">${description}</p>
+     <p class="temp">${temperament}</p>
+     <p class="origin">${origin}</p></div>`}).join('')
+    }
+ }

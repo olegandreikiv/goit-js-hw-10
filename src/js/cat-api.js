@@ -1,41 +1,33 @@
-const API_KEY = 'live_9WnopwNPu3WmqazzM9fAS8v0TqL7wbT7hKvHN1rLPdk4kTmhaysx44BgGkeZDyvY'; 
-async function fetchApi(url) {
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'x-api-key': API_KEY,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Request failed');
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw new Error('Request failed');
-  }
-}
+// const API_KEY = 'live_9WnopwNPu3WmqazzM9fAS8v0TqL7wbT7hKvHN1rLPdk4kTmhaysx44BgGkeZDyvY'; 
+const BASE_URL = "https://api.thecatapi.com/v1";
+const END_POINT ="/breeds";
+import axios from "axios";
+import { Loading } from 'notiflix/build/notiflix-loading-aio'
+axios.defaults.headers.common["x-api-key"] = "live_9WnopwNPu3WmqazzM9fAS8v0TqL7wbT7hKvHN1rLPdk4kTmhaysx44BgGkeZDyvY";
 
-// отримання списку порід
-async function fetchBreeds() {
-  const url = 'https://api.thecatapi.com/v1/breeds';
-  try {
-    const breeds = await fetchApi(url);
-    return breeds;
-  } catch (error) {
-    throw new Error('Failed to fetch breeds');
-  }
-}
 
-// отримання інформації про породу
-async function fetchCatByBreed(breedId) {
-  const url = `https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`;
-  try {
-    const [cat] = await fetchApi(url);
-    return cat;
-  } catch (error) {
-    throw new Error('Failed to fetch cat by breed');
-  }
-}
 
-export { fetchBreeds, fetchCatByBreed };
+function fetchBreeds(){
+  Loading.arrows()
+    return axios.get(`${BASE_URL}${END_POINT}`)
+     .then(response =>{
+      if(response.status !== 200) {
+  throw new Error (response.data)
+      }
+      return response.data
+  })
+  }
+
+  function fetchCatByBreed(breedId){
+    Loading.arrows()
+    const SEARCH = `/images/search?breed_ids=${breedId}`
+    return axios.get(`${BASE_URL}${SEARCH}`)
+     .then(response =>{
+      if(response.status !== 200) {
+        throw new Error (response.data )
+      }
+      return response.data})
+  }
+
+
+  export {fetchBreeds, fetchCatByBreed};
