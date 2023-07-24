@@ -4,25 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>МурІнфо</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/slim-select@latest/dist/slimselect.css"
-    />
-    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="css/slimselect.css" />
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <main>
-      <div class="container">
-        <select class="breed-select"></select>
-        <p class="error">Oops! Something went wrong! Try reloading the page!</p>
-        <div class="cat-info"></div>
-      </div>
-    </main>
+    <select class="breed-select" id="single"></select>
 
-    <script src="./js/index.js" type="module"></script>
+    <div class="cat-info"></div>
+
+    <script src="js/index.js" type="module"></script>
   </body>
 </html>
